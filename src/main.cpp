@@ -1,12 +1,13 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <string_view>
 // #include <unordered_map>
 // #include "json.h"
 
-void retrieve_pair(const std::string&, std::string::iterator&);
-void read_object(const std::string&, std::string::iterator&);
-void to_number(const std::string&);
+void read_object(std::string_view, std::string::iterator&);
+void retrieve_pair(std::string_view, std::string::iterator&);
+void to_number(std::string_view);
 
 int main() {
     std::ifstream stream("file.json");
@@ -40,7 +41,7 @@ int main() {
 }
 
 
-void read_object(const std::string& string, std::string::iterator& it) {	
+void read_object(std::string_view string, std::string::iterator& it) {	
 	while(*it == ' ')
 		++it;
 			
@@ -51,7 +52,7 @@ void read_object(const std::string& string, std::string::iterator& it) {
 }
 
 
-void retrieve_pair(const std::string& string, std::string::iterator& it) {
+void retrieve_pair(std::string_view string, std::string::iterator& it) {
 	std::string key, value;
 	
 	++it;
@@ -91,7 +92,7 @@ void retrieve_pair(const std::string& string, std::string::iterator& it) {
 	std::cout << "\n\nKey |" << key << "|\nValue |" << value << "|";
 }
 
-void to_number(const std::string& string){
+void to_number(std::string_view string){
 	// Работаем
 	//int a = std::stoi(value);
 			//std::cout  << a <<"\n";
