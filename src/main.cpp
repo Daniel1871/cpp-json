@@ -4,7 +4,8 @@
 #include <string_view>
 // #include <unordered_map>
 // #include "json.h"
-#include <iterator>
+#include <cctype>
+#include <algorithm>
 
 void read_object(std::string_view, std::string::iterator&);
 void retrieve_pair(std::string_view, std::string::iterator&);
@@ -16,12 +17,15 @@ int main() {
     	std::cerr << "Impossible to open the file" << std::endl;
     	return 1;
     }
-	
-    std::string string((std::istream_iterator<char>(stream)), (std::istream_iterator<char>()));
-    std::cout << string;
     
+    
+    std::string string((std::istreambuf_iterator<char>(stream)), (std::istreambuf_iterator<char>()));
+        
     std::string::iterator it = string.begin();
-    while(it != string.end()) {   	
+    while(it != string.end()) {
+    	while(*it == ' ' || *it == '\n')
+			++it;
+    	
     	if(*it == '{')
     		read_object(string, ++it);
     	// Иначе это сразу объект - ПОТОМ
@@ -35,7 +39,10 @@ int main() {
 }
 
 
-void read_object(std::string_view string, std::string::iterator& it) {			
+void read_object(std::string_view string, std::string::iterator& it) {	
+	while(*it == ' ' || *it == '\n')
+		++it;
+			
 	while(*it != '}') {
 		retrieve_pair(string, it); // Не пробел и не } -> " -> будем извлекать пару ключ-значение
 	}
@@ -54,7 +61,7 @@ void retrieve_pair(std::string_view string, std::string::iterator& it) {
 	}
 	++it;
 	
-	if(*it == ':')
+	while(*it == ':' || *it == ' ' || *it == '\n')
 		++it;
 	
 	if(*it == '"'){
@@ -66,7 +73,7 @@ void retrieve_pair(std::string_view string, std::string::iterator& it) {
 		}
 		++it;
 	} else {
-		while(*it != ',' && *it != '}') 
+		while(*it != ' ' && *it != '\n' && *it != ',' && *it != '}') 
 			value += *it++;
 		
 		if(value[0] == '-' || std::isdigit(value[0])){ 
@@ -77,7 +84,7 @@ void retrieve_pair(std::string_view string, std::string::iterator& it) {
 	}
 	
 	// Проходим через запятую при ее наличии
-	if(*it == ',')
+	while(*it == ' ' || *it == '\n' || *it == ',')
 		++it;
 	
 	std::cout << "\n\nKey |" << key << "|\nValue |" << value << "|";
