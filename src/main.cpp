@@ -4,8 +4,9 @@
 #include <string_view>
 // #include <unordered_map>
 // #include "json.h"
-#include <cctype>
-#include <algorithm>
+
+#include <charconv> // std::from_chars (либо не через string_view принимать)
+
 
 void read_object(std::string_view, std::string::iterator&);
 void retrieve_pair(std::string_view, std::string::iterator&);
@@ -17,7 +18,6 @@ int main() {
     	std::cerr << "Impossible to open the file" << std::endl;
     	return 1;
     }
-    
     
     std::string string((std::istreambuf_iterator<char>(stream)), (std::istreambuf_iterator<char>()));
     std::cout << string << "\n-----------------------------";
@@ -52,7 +52,7 @@ void read_object(std::string_view string, std::string::iterator& it) {
 
 
 void retrieve_pair(std::string_view string, std::string::iterator& it) {
-	std::string key, value;
+	std::string key, value; // ПОДУМАТЬ тут про STRING VIEW
 	
 	++it;
 	while(*it != '"'){
@@ -77,8 +77,7 @@ void retrieve_pair(std::string_view string, std::string::iterator& it) {
 		while(*it != ' ' && *it != '\n' && *it != ',' && *it != '}') 
 			value += *it++;
 		
-		if(value[0] == '-' || std::isdigit(value[0])){ 
-			std::cout  << "\n!!!";
+		if(value[0] == '-' || value[0] == '+' || std::isdigit(value[0])){ 
 			to_number(value);
 			
 		}
@@ -91,9 +90,16 @@ void retrieve_pair(std::string_view string, std::string::iterator& it) {
 	std::cout << "\n\n\"" << key << "\": \"" << value << "\"";
 }
 
-void to_number(std::string_view string){
-	// Работаем
-	//int a = std::stoi(value);
-			//std::cout  << a <<"\n";
+void to_number(std::string_view string) {
+    // std::string_view string = "asbnfasf"; !!! Добавить к from chars сравнение с std::errc()
+    if(string.find('.') == std::string_view::npos){
+        int number;
+        std::from_chars(string.data(), string.data() + string.size(), number);
+        std::cout << std::endl << number;
+    } else {
+        double number;
+        std::from_chars(string.data(), string.data() + string.size(), number);
+        std::cout << std::endl << number;
+    }
 }
 
