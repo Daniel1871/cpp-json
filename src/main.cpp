@@ -20,6 +20,7 @@ int main() {
     
     
     std::string string((std::istreambuf_iterator<char>(stream)), (std::istreambuf_iterator<char>()));
+    std::cout << string << "\n-----------------------------";
         
     std::string::iterator it = string.begin();
     while(it != string.end()) {
@@ -87,7 +88,7 @@ void retrieve_pair(std::string_view string, std::string::iterator& it) {
 	while(*it == ' ' || *it == '\n' || *it == ',')
 		++it;
 	
-	std::cout << "\n\nKey |" << key << "|\nValue |" << value << "|";
+	std::cout << "\n\n\"" << key << "\": \"" << value << "\"";
 }
 
 void to_number(std::string_view string){
