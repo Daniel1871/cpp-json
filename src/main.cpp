@@ -20,9 +20,10 @@ int main() {
     }
     
     std::string string((std::istreambuf_iterator<char>(stream)), (std::istreambuf_iterator<char>()));
-    std::cout << string << "\n-----------------------------";
+    std::cout << string << "\n-----------------------------\n";
         
     std::string::iterator it = string.begin();
+    
     while(it != string.end()) {
     	while(*it == ' ' || *it == '\n')
 			++it;
@@ -46,8 +47,7 @@ void read_object(std::string_view string, std::string::iterator& it) {
 			
 	while(*it != '}') {
 		retrieve_pair(string, it); // Не пробел и не } -> " -> будем извлекать пару ключ-значение
-	}
-	
+	}	
 }
 
 
@@ -87,21 +87,21 @@ void retrieve_pair(std::string_view string, std::string::iterator& it) {
 	while(*it == ' ' || *it == '\n' || *it == ',')
 		++it;
 	
-	std::cout << "\n\n\"" << key << "\": \"" << value << "\"";
+	std::cout << "\n\"" << key << "\": \"" << value << "\"\n";
 }
 
 void to_number(std::string_view string) {
     if(string.find('.') == std::string_view::npos){
-        int number;
-        if(std::from_chars(string.data(), string.data() + string.size(), number).ec == std::errc())
-        	std::cout << std::endl << number;
-        else 
+        int number = 0;
+        if(std::from_chars(string.data(), string.data() + string.size(), number).ec == std::errc()){
+        	// ДЕЙСТВИЕ!!!
+        } else 
         	std::cerr << "Invalid conversion to int" << std::endl;
     } else {
-        double number;
-        if(std::from_chars(string.data(), string.data() + string.size(), number).ec == std::errc())
-        	std::cout << std::endl << number;
-        else 
+        double number = 0.0;
+        if(std::from_chars(string.data(), string.data() + string.size(), number).ec == std::errc()) {
+        	// ДЕЙСТВИЕ!!!
+        } else 
         	std::cerr << "Invalid conversion to double" << std::endl;
     }
 }
