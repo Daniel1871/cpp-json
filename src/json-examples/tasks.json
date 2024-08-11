@@ -1,0 +1,402 @@
+{
+  "2025": [
+    {
+      "month": "08",
+      "day": 11,
+      "time": "01:38",
+      "task": "Implement a 'smart' calculator that treats every user error as a new calculation method."
+    }
+  ],
+  "2025": [
+    {
+      "month": "08",
+      "day": 19,
+      "time": "10:06",
+      "task": "Create a program that randomly replaces all spaces in a text with emojis."
+    }
+  ],
+  "2024": [
+    {
+      "month": "03",
+      "day": 2,
+      "time": "00:56",
+      "task": "Write a program that generates random conspiracy theories based on user input."
+    }
+  ],
+  "2025": [
+    {
+      "month": "02",
+      "day": 26,
+      "time": "10:52",
+      "task": "Design a 'randomly capitalizes' function that randomly changes the case of letters in strings."
+    }
+  ],
+  "2025": [
+    {
+      "month": "03",
+      "day": 19,
+      "time": "16:41",
+      "task": "Create a function that determines if a number is 'too tired' to be prime."
+    }
+  ],
+  "2024": [
+    {
+      "month": "01",
+      "day": 4,
+      "time": "16:13",
+      "task": "Find all the bugs in the code that 'works perfectly'."
+    }
+  ],
+  "2025": [
+    {
+      "month": "12",
+      "day": 17,
+      "time": "08:09",
+      "task": "Create a calculator that gives users random life advice instead of doing arithmetic."
+    }
+  ],
+  "2024": [
+    {
+      "month": "06",
+      "day": 17,
+      "time": "08:33",
+      "task": "Create a function that returns the 'laziest' number from an array."
+    }
+  ],
+  "2024": [
+    {
+      "month": "07",
+      "day": 14,
+      "time": "16:53",
+      "task": "Write a program that constantly complains about the user's code style."
+    }
+  ],
+  "2024": [
+    {
+      "month": "05",
+      "day": 15,
+      "time": "05:08",
+      "task": "Implement a clock that only shows the correct time once every hour."
+    }
+  ],
+  "2024": [
+    {
+      "month": "07",
+      "day": 29,
+      "time": "18:39",
+      "task": "Write a program that prints 'Hello, World!' 100 times without using loops."
+    }
+  ],
+  "2025": [
+    {
+      "month": "05",
+      "day": 13,
+      "time": "07:52",
+      "task": "Implement bubble sort, but every time the program swaps two elements, it makes a 'POOF' sound."
+    }
+  ],
+  "2025": [
+    {
+      "month": "10",
+      "day": 11,
+      "time": "01:29",
+      "task": "Create a function that always returns '42' no matter what input it gets."
+    }
+  ],
+  "2024": [
+    {
+      "month": "05",
+      "day": 1,
+      "time": "19:30",
+      "task": "Implement a program that always suggests the most complicated solution to a simple problem."
+    }
+  ],
+  "2025": [
+    {
+      "month": "04",
+      "day": 27,
+      "time": "04:23",
+      "task": "Implement a program that automatically writes comments explaining that any bugs are 'features'."
+    }
+  ],
+  "2025": [
+    {
+      "month": "11",
+      "day": 29,
+      "time": "12:25",
+      "task": "Write a program that randomly replaces variables with 'foo', 'bar', and 'baz'."
+    }
+  ],
+  "2024": [
+    {
+      "month": "01",
+      "day": 22,
+      "time": "01:45",
+      "task": "Implement a function that returns the factorial of a number, but only if the number 'feels like it'."
+    }
+  ],
+  "2025": [
+    {
+      "month": "11",
+      "day": 18,
+      "time": "02:03",
+      "task": "Write a program that refuses to run unless the user praises the code."
+    }
+  ],
+  "2024": [
+    {
+      "month": "10",
+      "day": 17,
+      "time": "14:28",
+      "task": "Implement a 'motivational speaker' mode that encourages the user to keep coding, no matter what."
+    }
+  ],
+  "2025": [
+    {
+      "month": "08",
+      "day": 7,
+      "time": "11:11",
+      "task": "Create a 'random error generator' that throws a random error message every once in a while, even if nothing is wrong."
+    }
+  ],
+  "2024": [
+    {
+      "month": "06",
+      "day": 25,
+      "time": "16:29",
+      "task": "Create a 'random compliment generator' that outputs a compliment each time the code compiles without errors."
+    }
+  ],
+  "2024": [
+    {
+      "month": "05",
+      "day": 23,
+      "time": "01:09",
+      "task": "Create a 'random excuse generator' for why a piece of code doesn't work."
+    }
+  ],
+  "2024": [
+    {
+      "month": "04",
+      "day": 13,
+      "time": "05:21",
+      "task": "Write a program that asks the user: 'Are you sure you need this code?' three times before proceeding."
+    }
+  ],
+  "2024": [
+    {
+      "month": "08",
+      "day": 30,
+      "time": "19:34",
+      "task": "Write a program that adds random comments to the code, such as 'Are you sure about this?' or 'Good luck debugging this!'"
+    }
+  ],
+  "2025": [
+    {
+      "month": "02",
+      "day": 17,
+      "time": "18:00",
+      "task": "Create a program that randomly changes the text encoding just for fun."
+    }
+  ],
+  "2025": [
+    {
+      "month": "10",
+      "day": 25,
+      "time": "03:18",
+      "task": "Write a program that simulates a loading screen, but never actually loads anything."
+    }
+  ],
+  "2025": [
+    {
+      "month": "08",
+      "day": 12,
+      "time": "01:40",
+      "task": "Implement a program that translates user input into 'developer speak'."
+    }
+  ],
+  "2024": [
+    {
+      "month": "07",
+      "day": 29,
+      "time": "16:24",
+      "task": "Design a 'mood' indicator that changes color depending on how much time the program took to compile."
+    }
+  ],
+  "2024": [
+    {
+      "month": "09",
+      "day": 29,
+      "time": "18:32",
+      "task": "Create a program that prints random motivational quotes whenever it crashes."
+    }
+  ],
+  "2024": [
+    {
+      "month": "11",
+      "day": 7,
+      "time": "17:49",
+      "task": "Implement a program that 'snoozes' for random amounts of time before executing."
+    }
+  ],
+  "2025": [
+    {
+      "month": "12",
+      "day": 14,
+      "time": "14:44",
+      "task": "Write a program that asks the user to solve simple math problems before allowing them to proceed."
+    }
+  ],
+  "2025": [
+    {
+      "month": "11",
+      "day": 8,
+      "time": "21:58",
+      "task": "Write a program that simulates the behavior of a grumpy compiler."
+    }
+  ],
+  "2024": [
+    {
+      "month": "01",
+      "day": 27,
+      "time": "22:00",
+      "task": "Create a program that adds random delays to simulate a slow internet connection."
+    }
+  ],
+  "2024": [
+    {
+      "month": "12",
+      "day": 24,
+      "time": "21:01",
+      "task": "Implement a program that gives random 'fun facts' about C++ every time it runs."
+    }
+  ],
+  "2025": [
+    {
+      "month": "04",
+      "day": 22,
+      "time": "17:05",
+      "task": "Write a program that occasionally gives up and outputs 'I don't know, you figure it out!'"
+    }
+  ],
+  "2025": [
+    {
+      "month": "07",
+      "day": 6,
+      "time": "11:01",
+      "task": "Design a program that randomly switches variable names every time it runs."
+    }
+  ],
+  "2024": [
+    {
+      "month": "12",
+      "day": 25,
+      "time": "17:12",
+      "task": "Create a program that plays hide-and-seek with the user by randomly closing itself."
+    }
+  ],
+  "2024": [
+    {
+      "month": "12",
+      "day": 19,
+      "time": "08:50",
+      "task": "Write a program that has a 50% chance of saying: 'Not my day, try again tomorrow.'"
+    }
+  ],
+  "2025": [
+    {
+      "month": "04",
+      "day": 24,
+      "time": "13:28",
+      "task": "Design a program that randomly decides whether to execute the code or not."
+    }
+  ],
+  "2024": [
+    {
+      "month": "07",
+      "day": 31,
+      "time": "10:35",
+      "task": "Design a 'meme generator' that inserts random memes into code comments."
+    }
+  ],
+  "2025": [
+    {
+      "month": "09",
+      "day": 27,
+      "time": "15:54",
+      "task": "Write a program that pretends to be working hard by displaying fake progress bars."
+    }
+  ],
+  "2025": [
+    {
+      "month": "09",
+      "day": 18,
+      "time": "05:46",
+      "task": "Create a program that generates a random number, but only when it feels like it."
+    }
+  ],
+  "2024": [
+    {
+      "month": "07",
+      "day": 8,
+      "time": "14:57",
+      "task": "Implement a function that reverses the order of an array, but only on Fridays."
+    }
+  ],
+  "2025": [
+    {
+      "month": "03",
+      "day": 31,
+      "time": "11:36",
+      "task": "Write a program that asks the user how their day is going before it starts."
+    }
+  ],
+  "2025": [
+    {
+      "month": "08",
+      "day": 21,
+      "time": "21:35",
+      "task": "Design a 'sarcasm detector' that outputs a sarcastic comment every time the user tries to compile."
+    }
+  ],
+  "2024": [
+    {
+      "month": "12",
+      "day": 30,
+      "time": "13:11",
+      "task": "Write a program that apologizes for every bug it encounters."
+    }
+  ],
+  "2025": [
+    {
+      "month": "02",
+      "day": 2,
+      "time": "03:56",
+      "task": "Implement a 'daily challenge' where the user must solve a random problem before continuing."
+    }
+  ],
+  "2025": [
+    {
+      "month": "10",
+      "day": 12,
+      "time": "03:21",
+      "task": "Make a 'magic 8-ball' program that always gives the most ambiguous answers."
+    }
+  ],
+  "2025": [
+    {
+      "month": "09",
+      "day": 20,
+      "time": "10:09",
+      "task": "Create a program that makes the user solve a puzzle before displaying the output."
+    }
+  ],
+  "2024": [
+    {
+      "month": "10",
+      "day": 27,
+      "time": "01:10",
+      "task": "Write a program that compliments the compiler on successful compilation."
+    }
+  ]
+}
