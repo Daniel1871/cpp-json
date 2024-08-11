@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
 project(cpp-json)
+set(CMAKE_CXX_STANDARD 20)
 add_executable(main src/main.cpp)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/file.json
-    ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/file.json ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
