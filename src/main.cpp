@@ -91,15 +91,18 @@ void retrieve_pair(std::string_view string, std::string::iterator& it) {
 }
 
 void to_number(std::string_view string) {
-    // std::string_view string = "asbnfasf"; !!! Добавить к from chars сравнение с std::errc()
     if(string.find('.') == std::string_view::npos){
         int number;
-        std::from_chars(string.data(), string.data() + string.size(), number);
-        std::cout << std::endl << number;
+        if(std::from_chars(string.data(), string.data() + string.size(), number).ec == std::errc())
+        	std::cout << std::endl << number;
+        else 
+        	std::cerr << "Invalid conversion to int" << std::endl;
     } else {
         double number;
-        std::from_chars(string.data(), string.data() + string.size(), number);
-        std::cout << std::endl << number;
+        if(std::from_chars(string.data(), string.data() + string.size(), number).ec == std::errc())
+        	std::cout << std::endl << number;
+        else 
+        	std::cerr << "Invalid conversion to double" << std::endl;
     }
 }
 
