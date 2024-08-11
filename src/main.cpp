@@ -52,34 +52,33 @@ void read_object(std::string_view string, std::string::iterator& it) {
 
 
 void retrieve_pair(std::string_view string, std::string::iterator& it) {
-	std::string key, value; // ПОДУМАТЬ тут про STRING VIEW
-	
-	++it;
+	std::string::iterator first(++it);
 	while(*it != '"'){
 		if(*it == '\\')
-    		key += *it++; // При экранировании оставляем \ и экранированный символ	
-		key += *it++;
+    		it++; // При экранировании оставляем \ и экранированный символ
+		it++;
 	}
-	++it;
+	std::string_view key(first, it++), value;
 	
 	while(*it == ':' || *it == ' ' || *it == '\n')
 		++it;
-	
-	if(*it == '"'){
-		++it;
+		
+	if(*it == '"'){		
+		first = ++it;
 		while(*it != '"'){
 			if(*it == '\\')
-    			value += *it++;
-			value += *it++;
+    			it++;
+			it++;
 		}
-		++it;
+		value = std::string_view(first, it++);
 	} else {
+	    first = it;
 		while(*it != ' ' && *it != '\n' && *it != ',' && *it != '}') 
-			value += *it++;
+			it++;
+		value = std::string_view(first, it);
 		
 		if(value[0] == '-' || value[0] == '+' || std::isdigit(value[0])){ 
 			to_number(value);
-			
 		}
 	}
 	
