@@ -3,19 +3,21 @@
 #include <string>
 #include <string_view>
 #include <unordered_map>
+#include <map>
+#include <charconv> // std::from_chars (либо не через string_view принимать)
 // #include "json.h"
 
-#include <charconv> // std::from_chars (либо не через string_view принимать)
-
-void printJsonMap(const std::unordered_map<int, std::unordered_map<int, std::unordered_map<int, std::unordered_map<std::string, std::string>>>>&);
-void read_object(std::string_view, std::string::iterator&);
+void read_pair(std::string_view, std::string::iterator&);
 void retrieve_pair(std::string_view, std::string::iterator&);
 void toNumber(std::string_view);
+void printJsonMap(const std::unordered_map<int, std::unordered_map<int, std::unordered_map<int, std::multimap<std::string, std::string>>>>&);
+void error();
 
 int main() {
-	std::unordered_map<int, std::unordered_map<int, std::unordered_map<int, std::unordered_map<std::string, std::string>>>> jsonMap;
+	std::unordered_map<int, std::unordered_map<int, std::unordered_map<int, std::multimap<std::string, std::string>>>> jsonMap;
 	
 	// jsonMap[2024][5][29] = {{"05:02", "Go home"}, {"06:03", "Go to village"}};
+	// jsonMap[2024][5][29].emplace("05:02", "Sidi doma");
 	// printJsonMap(jsonMap);	
 	
     std::ifstream stream("tasks_ex.json");
@@ -25,41 +27,31 @@ int main() {
     }
     
     std::string string((std::istreambuf_iterator<char>(stream)), (std::istreambuf_iterator<char>()));
-    std::cout << string << "\n-----------------------------\n";
+    std::cout << string << "\n--------------------------------------------------------------------------------\n";
         
     std::string::iterator it = string.begin();
-    while(it != string.end()) {
-    	while(*it == ' ' || *it == '\n')
-			++it;
-    	
-    	if(*it == '{')
-    		read_object(string, ++it);
-    	// Иначе это сразу объект - ПОТОМ
-    	return 2;
-   
-    }
+    if(*it != '{') error;
+    
+    while(it != string.end() && *it != '}') // ?
+    	read_pair(string, ++it);
     
     stream.close();
     return 0;
 }
 
-void printJsonMap(const std::unordered_map<int, std::unordered_map<int, std::unordered_map<int, std::unordered_map<std::string, std::string>>>>& jsonMap){
-	std::cout <<  "year -> month -> day -> time -> task" << std::endl;
-	for(const auto& [year, umap] : jsonMap)
-		for(const auto& [month, umap] : umap)
-			for(const auto& [day, umap] : umap)
-				for(const auto& [time, task] : umap)
-					std::cout << year << " -> " << month << " -> " << day << " -> " << time << " -> " << task << std::endl;
-		
-}
-
-void read_object(std::string_view string, std::string::iterator& it) {	
+void read_pair(std::string_view string, std::string::iterator& it) {	
 	while(*it == ' ' || *it == '\n')
 		++it;
-			
-	while(*it != '}') {
-		retrieve_pair(string, it); // Не пробел и не } -> " -> будем извлекать пару ключ-значение
-	}	
+		
+	if(*it != '"') error;
+	
+	std::string::iterator first(++it);
+	while(*it != '"') it++;
+	
+	std::string_view key(first, it++), value;
+	
+	std::cout << key;
+	exit(5);
 }
 
 
@@ -119,5 +111,21 @@ void toNumber(std::string_view string) {
         } else 
         	std::cerr << "Invalid conversion to double" << std::endl;
     }
+}
+
+
+
+void printJsonMap(const std::unordered_map<int, std::unordered_map<int, std::unordered_map<int, std::multimap<std::string, std::string>>>>& jsonMap){
+	std::cout <<  "year -> month -> day -> time -> task" << std::endl;
+	for(const auto& [year, umap] : jsonMap)
+		for(const auto& [month, umap] : umap)
+			for(const auto& [day, umap] : umap)
+				for(const auto& [time, task] : umap)
+					std::cout << year << " -> " << month << " -> " << day << " -> " << time << " -> " << task << std::endl;
+}
+
+void error(){
+	std::cerr << "Incorrect format of json file" << std::endl;
+    exit(1); 
 }
 
