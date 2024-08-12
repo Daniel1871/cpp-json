@@ -1,0 +1,26 @@
+{
+  "2025": [
+    {
+      "month": "08",
+      "day": 11,
+      "time": "01:38",
+      "task": "Implement a 'smart' calculator that treats every user error as a new calculation method."
+    }
+  ],
+  "2025": [
+    {
+      "month": "08",
+      "day": 19,
+      "time": "10:06",
+      "task": "Create a program that randomly replaces all spaces in a text with emojis."
+    }
+  ],
+  "2024": [
+    {
+      "month": "03",
+      "day": 2,
+      "time": "00:56",
+      "task": "Write a program that generates random conspiracy theories based on user input."
+    }
+  ]
+}
