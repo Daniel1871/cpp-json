@@ -5,20 +5,22 @@
 #include <unordered_map>
 #include <map>
 #include <charconv> // std::from_chars (либо не через string_view принимать)
+#include <utility> // std::pair (возврат значений из функции)
 // #include "json.h"
 
-void read_pair(std::string_view, std::string::iterator&);
-void retrieve_pair(std::string_view, std::string::iterator&);
-void toNumber(std::string_view);
-void printJsonMap(const std::unordered_map<int, std::unordered_map<int, std::unordered_map<int, std::multimap<std::string, std::string>>>>&);
+void retrieve_task(std::string_view, std::string::iterator&, std::unordered_map<size_t, std::unordered_map<size_t, std::unordered_map<size_t, std::multimap<std::string, std::string>>>>&);
+std::pair<std::string_view, std::string_view> retrieve_pair(std::string_view, std::string::iterator&);
+size_t toNumber(std::string_view);
+void printJsonMap(const std::unordered_map<size_t, std::unordered_map<size_t, std::unordered_map<size_t, std::multimap<std::string, std::string>>>>&);
 void error();
 
 int main() {
-	std::unordered_map<int, std::unordered_map<int, std::unordered_map<int, std::multimap<std::string, std::string>>>> jsonMap;
+	std::unordered_map<size_t, std::unordered_map<size_t, std::unordered_map<size_t, std::multimap<std::string, std::string>>>> jsonMap;
 	
 	// jsonMap[2024][5][29] = {{"05:02", "Go home"}, {"06:03", "Go to village"}};
 	// jsonMap[2024][5][29].emplace("05:02", "Sidi doma");
 	// printJsonMap(jsonMap);	
+	
 	
     std::ifstream stream("tasks_ex.json");
     if(!stream) {
@@ -32,90 +34,92 @@ int main() {
     std::string::iterator it = string.begin();
     if(*it != '{') error;
     
-    while(it != string.end() && *it != '}') // ?
-    	read_pair(string, ++it);
+    while(it != string.end())
+    	retrieve_task(string, ++it, jsonMap);
+    
+    //printJsonMap(jsonMap);
     
     stream.close();
     return 0;
 }
 
-void read_pair(std::string_view string, std::string::iterator& it) {	
+
+void retrieve_task(std::string_view string, std::string::iterator& it, std::unordered_map<size_t, std::unordered_map<size_t, std::unordered_map<size_t, std::multimap<std::string, std::string>>>>& jsonMap) {	
 	while(*it == ' ' || *it == '\n')
 		++it;
 		
 	if(*it != '"') error;
 	
 	std::string::iterator first(++it);
-	while(*it != '"') it++;
+	while(*it != '"') ++it; // !
+	std::string_view key(first, it++);
 	
-	std::string_view key(first, it++), value;
+	while(*it == ':' || *it == ' ' || *it == '\n' || *it == '[' || *it == '{') ++it;
 	
-	std::cout << key;
+	size_t year = toNumber(key), month, day;
+	std::string_view time, task;
+	
+	
+	std::string_view keys[] = {"month", "day", "time", "task"};
+	for(const auto& sv : keys) {
+		auto [key, value] = retrieve_pair(string, it);
+		
+		if(key == "month") month = toNumber(value);
+		else if(key == "day") day = toNumber(value);
+		else if(key == "time") time = value;
+		else if(key == "task") task = value;
+		else error;
+		// std::cout << "\n\"" << key << "\": \"" << value << "\"\n" << *it << *(it+1) << *(it+2) << std::endl;
+	}
+	
+	// std::cout << key << year << " -> " << month << " -> " << day << " -> " << time << " -> " << task << std::endl;
+	
+	jsonMap[year][month][day].emplace(time, task);
+	printJsonMap(jsonMap);
 	exit(5);
 }
 
 
-void retrieve_pair(std::string_view string, std::string::iterator& it) {
+std::pair<std::string_view, std::string_view> retrieve_pair(std::string_view string, std::string::iterator& it) {
+	if(*it != '"') error;
+	
 	std::string::iterator first(++it);
-	while(*it != '"'){
-		if(*it == '\\')
-    		it++; // При экранировании оставляем \ и экранированный символ
-		it++;
-	}
+	while(*it != '"') ++it; // !
+	
 	std::string_view key(first, it++), value;
 	
-	while(*it == ':' || *it == ' ' || *it == '\n')
+	while(*it == ':' || *it == ' ')
 		++it;
 		
 	if(*it == '"'){ // Значение - строка
 		first = ++it;
-		while(*it != '"'){
-			if(*it == '\\')
-    			it++;
-			it++;
-		}
+		while(*it != '"') ++it;
 		value = std::string_view(first, it++);
-	} else { // Значение - не строка
-	    first = it;
-		while(*it != ' ' && *it != '\n' && *it != ',' && *it != '}') 
-			it++;
+	} else { // Значение - size_t
+		first = it;
+		while(*it != ',') it++;
 		value = std::string_view(first, it);
-		
-		if(std::isdigit(value[0]) || value[0] == '-' || value[0] == '+' || value[0] == '.'){ // Значение - число
-			toNumber(value);
-		} else if(value == "true" || value == "false") { // Значение - bool
-		
-		} else if(value == "null") { // Значение - null
-		
-		}
 	}
 	
-	// Проходим через запятую при ее наличии
-	while(*it == ' ' || *it == '\n' || *it == ',')
+	while(*it == ' ' || *it == '\n' || *it == ',' || *it == ']' || *it == '}')
 		++it;
 	
-	std::cout << "\n\"" << key << "\": \"" << value << "\"\n";
+	// std::cout << "\n\"" << key << "\": \"" << value << *it<< *(it+1)<< "\"\n";
+	return std::make_pair(key, value);
 }
 
-void toNumber(std::string_view string) {
-    if(string.find('.') == std::string_view::npos){
-        int number = 0;
-        if(std::from_chars(string.data(), string.data() + string.size(), number).ec == std::errc()){
-        	// ДЕЙСТВИЕ!!!
-        } else 
-        	std::cerr << "Invalid conversion to int" << std::endl;
-    } else {
-        double number = 0.0;
-        if(std::from_chars(string.data(), string.data() + string.size(), number).ec == std::errc()) {
-        	// ДЕЙСТВИЕ!!!
-        } else 
-        	std::cerr << "Invalid conversion to double" << std::endl;
-    }
+size_t toNumber(std::string_view string) {
+    size_t number = 0;
+    if(std::from_chars(string.data(), string.data() + string.size(), number).ec == std::errc())
+    	return number;
+  	std::cerr << "Invalid conversion to size_t" << std::endl;
+	exit(1);
 }
 
 
 
-void printJsonMap(const std::unordered_map<int, std::unordered_map<int, std::unordered_map<int, std::multimap<std::string, std::string>>>>& jsonMap){
+
+void printJsonMap(const std::unordered_map<size_t, std::unordered_map<size_t, std::unordered_map<size_t, std::multimap<std::string, std::string>>>>& jsonMap) {
 	std::cout <<  "year -> month -> day -> time -> task" << std::endl;
 	for(const auto& [year, umap] : jsonMap)
 		for(const auto& [month, umap] : umap)
