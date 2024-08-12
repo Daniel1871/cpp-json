@@ -2,18 +2,23 @@
 #include <fstream>
 #include <string>
 #include <string_view>
-// #include <unordered_map>
+#include <unordered_map>
 // #include "json.h"
 
 #include <charconv> // std::from_chars (либо не через string_view принимать)
 
-
+void printJsonMap(const std::unordered_map<int, std::unordered_map<int, std::unordered_map<int, std::unordered_map<std::string, std::string>>>>&);
 void read_object(std::string_view, std::string::iterator&);
 void retrieve_pair(std::string_view, std::string::iterator&);
 void toNumber(std::string_view);
 
 int main() {
-    std::ifstream stream("random.json");
+	std::unordered_map<int, std::unordered_map<int, std::unordered_map<int, std::unordered_map<std::string, std::string>>>> jsonMap;
+	
+	// jsonMap[2024][5][29] = {{"05:02", "Go home"}, {"06:03", "Go to village"}};
+	// printJsonMap(jsonMap);	
+	
+    std::ifstream stream("tasks_ex.json");
     if(!stream) {
     	std::cerr << "Impossible to open the file" << std::endl;
     	return 1;
@@ -38,6 +43,15 @@ int main() {
     return 0;
 }
 
+void printJsonMap(const std::unordered_map<int, std::unordered_map<int, std::unordered_map<int, std::unordered_map<std::string, std::string>>>>& jsonMap){
+	std::cout <<  "year -> month -> day -> time -> task" << std::endl;
+	for(const auto& [year, umap] : jsonMap)
+		for(const auto& [month, umap] : umap)
+			for(const auto& [day, umap] : umap)
+				for(const auto& [time, task] : umap)
+					std::cout << year << " -> " << month << " -> " << day << " -> " << time << " -> " << task << std::endl;
+		
+}
 
 void read_object(std::string_view string, std::string::iterator& it) {	
 	while(*it == ' ' || *it == '\n')
