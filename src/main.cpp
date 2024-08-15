@@ -53,9 +53,9 @@ void readFile(std::string_view filename, std::string& string){
 
 
 void fillJsonMap(std::unordered_map<size_t, std::unordered_map<size_t, std::unordered_map<size_t, std::multimap<std::string, std::string>>>>& jsonMap, 
-	std::string::iterator it, std::string::iterator end){
+    std::string::iterator it, std::string::iterator end){
 
-	if(*it != '{') error();
+    if(*it != '{') error();
     ++it;
     while(*it == ' ' || *it == '\n') ++it;
     
