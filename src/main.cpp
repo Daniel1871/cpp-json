@@ -10,7 +10,7 @@
 
 void retrieve_task(std::string_view, std::string::iterator&, const std::string::iterator&, 
     std::unordered_map<size_t, std::unordered_map<size_t, std::unordered_map<size_t, std::multimap<std::string, std::string>>>>&);
-std::pair<std::string_view, std::string_view> retrieve_pair(std::string_view, std::string::iterator&);
+std::pair<std::string_view, std::string_view> retrieve_pair(std::string_view, std::string::iterator&, const std::string::iterator&);
 size_t toNumber(std::string_view);
 void printJsonMap(const std::unordered_map<size_t, std::unordered_map<size_t, std::unordered_map<size_t, std::multimap<std::string, std::string>>>>&);
 void error();
@@ -34,10 +34,8 @@ int main() {
     ++it;
     while(*it == ' ' || *it == '\n') ++it;
     
-    while(it != end){
+    while(it != end)
         retrieve_task(string, it, end, jsonMap); 
-        // break;
-       }
     
     std::cout << "\nResult after reading json file:\n\n";
 
@@ -51,12 +49,12 @@ int main() {
 void retrieve_task(std::string_view string, std::string::iterator& it, const std::string::iterator& end, 
     std::unordered_map<size_t, std::unordered_map<size_t, std::unordered_map<size_t, std::multimap<std::string, std::string>>>>& jsonMap) {			
     if(*it != '"') error;
-	
+ 
     std::string::iterator first(++it);
-	
+
     while(*it != '"'){
-        ++it;
         if(it == end) error();
+        ++it;
     }
     std::string_view key(first, it++);
 	
@@ -64,18 +62,18 @@ void retrieve_task(std::string_view string, std::string::iterator& it, const std
 
     size_t year = toNumber(key);
 
-    auto [key_month, str_month] = retrieve_pair(string, it);
+    auto [key_month, str_month] = retrieve_pair(string, it, end);
     if(key_month != "month") error();
     size_t month = toNumber(str_month);
 
-    auto [key_day, str_day] = retrieve_pair(string, it);
+    auto [key_day, str_day] = retrieve_pair(string, it, end);
     if(key_day != "day") error;
     size_t day = toNumber(str_day);
 
-    auto [key_time, time] = retrieve_pair(string, it);
+    auto [key_time, time] = retrieve_pair(string, it, end);
     if(key_time != "time") error();
 
-    auto [key_task, task] = retrieve_pair(string, it);
+    auto [key_task, task] = retrieve_pair(string, it, end);
     if(key_task != "task") error();
 
     // std::cout << year << " -> " << month << " -> " << day << " -> " << time << " -> " << task << std::endl << std::endl;
@@ -83,11 +81,14 @@ void retrieve_task(std::string_view string, std::string::iterator& it, const std
 }
 
 
-std::pair<std::string_view, std::string_view> retrieve_pair(std::string_view string, std::string::iterator& it) {
+std::pair<std::string_view, std::string_view> retrieve_pair(std::string_view string, std::string::iterator& it, const std::string::iterator& end) {
     if(*it != '"') error;
 
     std::string::iterator first(++it);
-    while(*it != '"') ++it; // !
+    while(*it != '"'){
+        if(it == end) error();
+        ++it;
+    }
 
     std::string_view key(first, it++), value;
 
@@ -96,14 +97,18 @@ std::pair<std::string_view, std::string_view> retrieve_pair(std::string_view str
 
     if(*it == '"'){ // Значение - строка
         first = ++it;
-        while(*it != '"') {
-            if(*it == '\\') ++it; // Экранированным мб только значение (ключи заранее знаем и сверяем их в retrieve_task)
+        while(*it != '"'){
+            if(it == end) error();
+            if(*it == '\\') ++it; // Экранированным мб только значение, причем именно строка (ключи заранее знаем и сверяем их в retrieve_task)
             ++it;
         }
         value = std::string_view(first, it++);
     } else { // Значение - size_t
         first = it;
-        while(*it != ',') ++it;
+        while(*it != ','){
+            if(it == end) error();
+            ++it;
+        }
         value = std::string_view(first, it);
     }
 
@@ -119,7 +124,7 @@ size_t toNumber(std::string_view string) {
     size_t number = 0;
     if(std::from_chars(string.data(), string.data() + string.size(), number).ec == std::errc())
         return number;
-  	std::cerr << "Invalid conversion to size_t." << std::endl;
+    std::cerr << "Invalid conversion to size_t." << std::endl;
     exit(1);
 }
 
