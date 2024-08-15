@@ -39,7 +39,7 @@ int main() {
     std::cout << "\nResult after reading json file:\n\n";
     printJsonMap(jsonMap);
     
-    createJson("new_json", jsonMap);
+    // createJson("new_json", jsonMap);
     
     return 0;
 }
