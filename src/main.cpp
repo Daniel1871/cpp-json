@@ -8,7 +8,9 @@
 #include <utility> // std::pair (возврат значений из функции)
 // #include "json.h"
 
-void readFile(std::string_view, std::string&);
+void createJson(const std::string&, std::unordered_map<size_t, std::unordered_map<size_t, std::unordered_map<size_t, std::multimap<std::string, std::string>>>>&);
+
+void readJson(const std::string&, std::string&);
 
 void fillJsonMap(std::unordered_map<size_t, std::unordered_map<size_t, std::unordered_map<size_t, std::multimap<std::string, std::string>>>>&,
 	std::string::iterator, std::string::iterator);
@@ -27,7 +29,7 @@ void error();
 
 int main() {
     std::string string;
-    readFile("tasks_ex.json", string);
+    readJson("tasks_ex.json", string);
     
     std::cout << string << "\n--------------------------------------------------------------------------------\n";
     
@@ -37,12 +39,25 @@ int main() {
     std::cout << "\nResult after reading json file:\n\n";
     printJsonMap(jsonMap);
     
+    createJson("new_json", jsonMap);
+    
     return 0;
 }
 
+void createJson(const std::string& filename, std::unordered_map<size_t, std::unordered_map<size_t, std::unordered_map<size_t, std::multimap<std::string, std::string>>>>& jsonMap){
+    // По функциям раскид потом
+    std::ofstream stream(filename);
+    /*if(!stream) {
+        std::cerr << "Unable to open the json file" << std::endl;
+        exit(1);
+    }
+    // string = std::string((std::istreambuf_iterator<char>(stream)), (std::istreambuf_iterator<char>()));*/
+    stream.close();
+}
 
-void readFile(std::string_view filename, std::string& string){
-	std::ifstream stream("tasks_ex.json");
+
+void readJson(const std::string& filename, std::string& string){
+    std::ifstream stream(filename);
     if(!stream) {
         std::cerr << "Unable to open the json file" << std::endl;
         exit(1);
@@ -75,11 +90,11 @@ void retrieveTask(std::string::iterator& it, const std::string::iterator& end,
         ++it;
     }
     std::string_view key(first, it++);
-	
+
     while(*it == ':' || *it == ' ' || *it == '\n' || *it == '[' || *it == '{') ++it;
 
     size_t year = toNumber(key);
-    if(year == 0) error(); // Мб можно добавить ограничение сверху или снищу
+    if(year == 0) error(); // Мб можно добавить ограничение сверху или сниpу
 
     auto [key_month, str_month] = retrievePair(it, end);
     size_t month = toNumber(str_month);
