@@ -8,47 +8,60 @@
 #include <utility> // std::pair (возврат значений из функции)
 // #include "json.h"
 
-void retrieve_task(std::string_view, std::string::iterator&, const std::string::iterator&, 
+void readFile(std::string_view, std::string&);
+void fillJsonMap(std::unordered_map<size_t, std::unordered_map<size_t, std::unordered_map<size_t, std::multimap<std::string, std::string>>>>&);
+
+void retrieveTask(std::string::iterator&, const std::string::iterator&, 
     std::unordered_map<size_t, std::unordered_map<size_t, std::unordered_map<size_t, std::multimap<std::string, std::string>>>>&);
-std::pair<std::string_view, std::string_view> retrieve_pair(std::string_view, std::string::iterator&, const std::string::iterator&);
+std::pair<std::string_view, std::string_view> retrievePair(std::string::iterator&, const std::string::iterator&);
 size_t toNumber(std::string_view);
 void printJsonMap(const std::unordered_map<size_t, std::unordered_map<size_t, std::unordered_map<size_t, std::multimap<std::string, std::string>>>>&);
 void error();
 
 int main() {
-    std::unordered_map<size_t, std::unordered_map<size_t, std::unordered_map<size_t, std::multimap<std::string, std::string>>>> jsonMap;
-    std::ifstream stream("tasks_ex.json");
-    if(!stream) {
-        std::cerr << "Unable to open the json file" << std::endl;
-        return 1;
-    }
+    std::string string;
+    readFile("tasks_ex.json", string);
     
-    std::string string((std::istreambuf_iterator<char>(stream)), (std::istreambuf_iterator<char>()));
     std::cout << string << "\n--------------------------------------------------------------------------------\n";
+    
+    std::unordered_map<size_t, std::unordered_map<size_t, std::unordered_map<size_t, std::multimap<std::string, std::string>>>> jsonMap;
+    fillJsonMap(jsonMap);
         
     std::string::iterator it = string.begin();
     std::string::iterator end = string.end();
     
-    if(*it != '{') error;
+    if(*it != '{') error();
     
     ++it;
     while(*it == ' ' || *it == '\n') ++it;
     
     while(it != end)
-        retrieve_task(string, it, end, jsonMap); 
+        retrieveTask(it, end, jsonMap); 
     
     std::cout << "\nResult after reading json file:\n\n";
 
     printJsonMap(jsonMap);
-    
-    stream.close();
     return 0;
 }
 
+void readFile(std::string_view filename, std::string& string){
+	std::ifstream stream("tasks_ex.json");
+    if(!stream) {
+        std::cerr << "Unable to open the json file" << std::endl;
+        exit(1);
+    }
+    string = std::string((std::istreambuf_iterator<char>(stream)), (std::istreambuf_iterator<char>()));
+    stream.close();
+}
 
-void retrieve_task(std::string_view string, std::string::iterator& it, const std::string::iterator& end, 
+void fillJsonMap(std::unordered_map<size_t, std::unordered_map<size_t, std::unordered_map<size_t, std::multimap<std::string, std::string>>>>& jsonMap){
+
+}
+
+
+void retrieveTask(std::string::iterator& it, const std::string::iterator& end, 
     std::unordered_map<size_t, std::unordered_map<size_t, std::unordered_map<size_t, std::multimap<std::string, std::string>>>>& jsonMap) {			
-    if(*it != '"') error;
+    if(*it != '"') error();
  
     std::string::iterator first(++it);
 
@@ -61,19 +74,22 @@ void retrieve_task(std::string_view string, std::string::iterator& it, const std
     while(*it == ':' || *it == ' ' || *it == '\n' || *it == '[' || *it == '{') ++it;
 
     size_t year = toNumber(key);
+    if(year == 0) error(); // Мб можно добавить ограничение сверху или снищу
 
-    auto [key_month, str_month] = retrieve_pair(string, it, end);
-    if(key_month != "month") error();
+    auto [key_month, str_month] = retrievePair(it, end);
     size_t month = toNumber(str_month);
+    if(key_month != "month" || month == 0 || month > 12) error(); 
 
-    auto [key_day, str_day] = retrieve_pair(string, it, end);
-    if(key_day != "day") error;
+    auto [key_day, str_day] = retrievePair(it, end);
     size_t day = toNumber(str_day);
+    if(key_day != "day" || day == 0 || day > 31) error(); // Для дня можно сделать жестче проверку (учитывая номер месяца)
+    
+    auto [key_time, time] = retrievePair(it, end);
+    if(key_time != "time" || time.length() != 5) error();
+    size_t hour = toNumber(time.substr(0, 2)), min = toNumber(time.substr(3, 2));
+    if(time[2] != ':' || hour > 23 || min > 59) error();
 
-    auto [key_time, time] = retrieve_pair(string, it, end);
-    if(key_time != "time") error();
-
-    auto [key_task, task] = retrieve_pair(string, it, end);
+    auto [key_task, task] = retrievePair(it, end);
     if(key_task != "task") error();
 
     // std::cout << year << " -> " << month << " -> " << day << " -> " << time << " -> " << task << std::endl << std::endl;
@@ -81,8 +97,8 @@ void retrieve_task(std::string_view string, std::string::iterator& it, const std
 }
 
 
-std::pair<std::string_view, std::string_view> retrieve_pair(std::string_view string, std::string::iterator& it, const std::string::iterator& end) {
-    if(*it != '"') error;
+std::pair<std::string_view, std::string_view> retrievePair(std::string::iterator& it, const std::string::iterator& end) {
+    if(*it != '"') error();
 
     std::string::iterator first(++it);
     while(*it != '"'){
@@ -99,7 +115,7 @@ std::pair<std::string_view, std::string_view> retrieve_pair(std::string_view str
         first = ++it;
         while(*it != '"'){
             if(it == end) error();
-            if(*it == '\\') ++it; // Экранированным мб только значение, причем именно строка (ключи заранее знаем и сверяем их в retrieve_task)
+            if(*it == '\\') ++it; // Экранированным мб только значение, причем именно строка (ключи заранее знаем и сверяем их в retrieveTask)
             ++it;
         }
         value = std::string_view(first, it++);
