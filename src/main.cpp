@@ -9,14 +9,21 @@
 // #include "json.h"
 
 void readFile(std::string_view, std::string&);
-void fillJsonMap(std::unordered_map<size_t, std::unordered_map<size_t, std::unordered_map<size_t, std::multimap<std::string, std::string>>>>&);
+
+void fillJsonMap(std::unordered_map<size_t, std::unordered_map<size_t, std::unordered_map<size_t, std::multimap<std::string, std::string>>>>&,
+	std::string::iterator, std::string::iterator);
 
 void retrieveTask(std::string::iterator&, const std::string::iterator&, 
     std::unordered_map<size_t, std::unordered_map<size_t, std::unordered_map<size_t, std::multimap<std::string, std::string>>>>&);
+    
 std::pair<std::string_view, std::string_view> retrievePair(std::string::iterator&, const std::string::iterator&);
+
 size_t toNumber(std::string_view);
+
 void printJsonMap(const std::unordered_map<size_t, std::unordered_map<size_t, std::unordered_map<size_t, std::multimap<std::string, std::string>>>>&);
+
 void error();
+
 
 int main() {
     std::string string;
@@ -25,24 +32,14 @@ int main() {
     std::cout << string << "\n--------------------------------------------------------------------------------\n";
     
     std::unordered_map<size_t, std::unordered_map<size_t, std::unordered_map<size_t, std::multimap<std::string, std::string>>>> jsonMap;
-    fillJsonMap(jsonMap);
-        
-    std::string::iterator it = string.begin();
-    std::string::iterator end = string.end();
-    
-    if(*it != '{') error();
-    
-    ++it;
-    while(*it == ' ' || *it == '\n') ++it;
-    
-    while(it != end)
-        retrieveTask(it, end, jsonMap); 
-    
-    std::cout << "\nResult after reading json file:\n\n";
+    fillJsonMap(jsonMap, string.begin(), string.end());
 
+    std::cout << "\nResult after reading json file:\n\n";
     printJsonMap(jsonMap);
+    
     return 0;
 }
+
 
 void readFile(std::string_view filename, std::string& string){
 	std::ifstream stream("tasks_ex.json");
@@ -54,8 +51,16 @@ void readFile(std::string_view filename, std::string& string){
     stream.close();
 }
 
-void fillJsonMap(std::unordered_map<size_t, std::unordered_map<size_t, std::unordered_map<size_t, std::multimap<std::string, std::string>>>>& jsonMap){
 
+void fillJsonMap(std::unordered_map<size_t, std::unordered_map<size_t, std::unordered_map<size_t, std::multimap<std::string, std::string>>>>& jsonMap, 
+	std::string::iterator it, std::string::iterator end){
+
+	if(*it != '{') error();
+    ++it;
+    while(*it == ' ' || *it == '\n') ++it;
+    
+    while(it != end)
+        retrieveTask(it, end, jsonMap); 
 }
 
 
@@ -144,6 +149,7 @@ size_t toNumber(std::string_view string) {
     exit(1);
 }
 
+
 void printJsonMap(const std::unordered_map<size_t, std::unordered_map<size_t, std::unordered_map<size_t, std::multimap<std::string, std::string>>>>& jsonMap) {
     std::cout <<  "year -> month -> day -> time -> task" << std::endl;
     for(const auto& [year, umap] : jsonMap)
@@ -152,6 +158,7 @@ void printJsonMap(const std::unordered_map<size_t, std::unordered_map<size_t, st
                 for(const auto& [time, task] : umap)
                     std::cout << year << " -> " << month << " -> " << day << " -> " << time << " -> " << task << std::endl;
 }
+
 
 void error(){
     std::cerr << "Incorrect format of the json file." << std::endl;
