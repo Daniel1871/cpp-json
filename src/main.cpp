@@ -44,19 +44,8 @@ int main() {
     return 0;
 }
 
-void createJson(const std::string& filename, std::unordered_map<size_t, std::unordered_map<size_t, std::unordered_map<size_t, std::multimap<std::string, std::string>>>>& jsonMap){
-    // По функциям раскид потом
-    std::ofstream stream(filename);
-    /*if(!stream) {
-        std::cerr << "Unable to open the json file" << std::endl;
-        exit(1);
-    }
-    // string = std::string((std::istreambuf_iterator<char>(stream)), (std::istreambuf_iterator<char>()));*/
-    stream.close();
-}
 
-
-void readJson(const std::string& filename, std::string& string){
+void readJson(const std::string& filename, std::string& string) {
     std::ifstream stream(filename);
     if(!stream) {
         std::cerr << "Unable to open the json file" << std::endl;
@@ -68,25 +57,23 @@ void readJson(const std::string& filename, std::string& string){
 
 
 void fillJsonMap(std::unordered_map<size_t, std::unordered_map<size_t, std::unordered_map<size_t, std::multimap<std::string, std::string>>>>& jsonMap, 
-    std::string::iterator it, std::string::iterator end){
+    std::string::iterator it, std::string::iterator end) {
 
     if(*it != '{') error();
     ++it;
     while(*it == ' ' || *it == '\n') ++it;
-    
-    while(it != end)
-        retrieveTask(it, end, jsonMap); 
+    while(it != end) retrieveTask(it, end, jsonMap); 
 }
 
 
 void retrieveTask(std::string::iterator& it, const std::string::iterator& end, 
-    std::unordered_map<size_t, std::unordered_map<size_t, std::unordered_map<size_t, std::multimap<std::string, std::string>>>>& jsonMap) {			
+    std::unordered_map<size_t, std::unordered_map<size_t, std::unordered_map<size_t, std::multimap<std::string, std::string>>>>& jsonMap) {	
+    		
     if(*it != '"') error();
- 
     std::string::iterator first(++it);
-
     while(*it != '"'){
-        if(it == end) error();
+        if(it == end)
+        	error();
         ++it;
     }
     std::string_view key(first, it++);
@@ -119,38 +106,37 @@ void retrieveTask(std::string::iterator& it, const std::string::iterator& end,
 
 std::pair<std::string_view, std::string_view> retrievePair(std::string::iterator& it, const std::string::iterator& end) {
     if(*it != '"') error();
-
     std::string::iterator first(++it);
     while(*it != '"'){
-        if(it == end) error();
+        if(it == end)
+        	error();
         ++it;
     }
-
     std::string_view key(first, it++), value;
 
-    while(*it == ':' || *it == ' ')
-        ++it;
+    while(*it == ':' || *it == ' ') ++it;
 
     if(*it == '"'){ // Значение - строка
         first = ++it;
         while(*it != '"'){
-            if(it == end) error();
-            if(*it == '\\') ++it; // Экранированным мб только значение, причем именно строка (ключи заранее знаем и сверяем их в retrieveTask)
+            if(it == end)
+            	error();
+            if(*it == '\\')
+            	++it; // Экранированным мб только значение, причем именно строка (ключи заранее знаем и сверяем их в retrieveTask)
             ++it;
         }
         value = std::string_view(first, it++);
     } else { // Значение - size_t
         first = it;
         while(*it != ','){
-            if(it == end) error();
+            if(it == end)
+            	error();
             ++it;
         }
         value = std::string_view(first, it);
     }
 
-    while(*it == ' ' || *it == '\n' || *it == ',' || *it == ']' || *it == '}')
-        ++it;
-
+    while(*it == ' ' || *it == '\n' || *it == ',' || *it == ']' || *it == '}') ++it;
     // std::cout << "\n\"" << key << "\": \"" << value << "\"\n";
     return std::make_pair(key, value);
 }
@@ -158,8 +144,7 @@ std::pair<std::string_view, std::string_view> retrievePair(std::string::iterator
 
 size_t toNumber(std::string_view string) {
     size_t number = 0;
-    if(std::from_chars(string.data(), string.data() + string.size(), number).ec == std::errc())
-        return number;
+    if(std::from_chars(string.data(), string.data() + string.size(), number).ec == std::errc()) return number;
     std::cerr << "Invalid conversion to size_t." << std::endl;
     exit(1);
 }
@@ -178,5 +163,17 @@ void printJsonMap(const std::unordered_map<size_t, std::unordered_map<size_t, st
 void error(){
     std::cerr << "Incorrect format of the json file." << std::endl;
     exit(1); 
+}
+
+
+void createJson(const std::string& filename, std::unordered_map<size_t, std::unordered_map<size_t, std::unordered_map<size_t, std::multimap<std::string, std::string>>>>& jsonMap) {
+    // По функциям раскид потом
+    std::ofstream stream(filename);
+    /*if(!stream) {
+        std::cerr << "Unable to open the json file" << std::endl;
+        exit(1);
+    }
+    // string = std::string((std::istreambuf_iterator<char>(stream)), (std::istreambuf_iterator<char>()));*/
+    stream.close();
 }
 
