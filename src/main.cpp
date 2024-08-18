@@ -2,27 +2,40 @@
 #include <fstream>
 #include <string>
 #include <string_view>
-#include <unordered_map>
-#include <map>
 #include <charconv> // std::from_chars (либо не через string_view принимать)
 #include <utility> // std::pair (возврат значений из функции)
 // #include "json.h"
 
-void createJson(const std::string&, std::unordered_map<size_t, std::unordered_map<size_t, std::unordered_map<size_t, std::multimap<std::string, std::string>>>>&);
+#include <vector>
+
+struct Task { 
+  size_t year = 0;
+  size_t month = 0;
+  size_t day = 0;
+  std::string time;
+  std::string description;
+  Task() {}
+  Task(size_t year, size_t month, size_t day, std::string_view time, std::string_view description) : year(year), month(month), day(day), time(time), description(description) {}
+  void print() const { std::cout << year << " -> " << month << " -> " << day << " -> " << time << " -> " << description << std::endl; }
+};
+
+void printTasks(std::vector<Task>& jsonVec){
+	for(const auto& task : jsonVec) task.print();
+}
+
+void createJson(const std::string&, std::vector<Task>&);
 
 void readJson(const std::string&, std::string&);
 
-void fillJsonMap(std::unordered_map<size_t, std::unordered_map<size_t, std::unordered_map<size_t, std::multimap<std::string, std::string>>>>&,
-	std::string::iterator, std::string::iterator);
+void filljsonVec(std::vector<Task>&, std::string::iterator, std::string::iterator);
 
-void retrieveTask(std::string::iterator&, const std::string::iterator&, 
-    std::unordered_map<size_t, std::unordered_map<size_t, std::unordered_map<size_t, std::multimap<std::string, std::string>>>>&);
+void retrieveTask(std::string::iterator&, const std::string::iterator&, std::vector<Task>&);
     
 std::pair<std::string_view, std::string_view> retrievePair(std::string::iterator&, const std::string::iterator&);
 
 size_t toNumber(std::string_view);
 
-void printJsonMap(const std::unordered_map<size_t, std::unordered_map<size_t, std::unordered_map<size_t, std::multimap<std::string, std::string>>>>&);
+void printjsonVec(const std::vector<Task>&);
 
 void error();
 
@@ -33,13 +46,14 @@ int main() {
     
     std::cout << string << "\n--------------------------------------------------------------------------------\n";
     
-    std::unordered_map<size_t, std::unordered_map<size_t, std::unordered_map<size_t, std::multimap<std::string, std::string>>>> jsonMap;
-    fillJsonMap(jsonMap, string.begin(), string.end());
+    std::vector<Task> jsonVec;
+    filljsonVec(jsonVec, string.begin(), string.end());
 
     std::cout << "\nResult after reading json file:\n\n";
-    printJsonMap(jsonMap);
     
-    // createJson("new_json", jsonMap);
+    printTasks(jsonVec);
+    
+    // createJson("new_json", jsonVec);
     
     return 0;
 }
@@ -56,18 +70,17 @@ void readJson(const std::string& filename, std::string& string) {
 }
 
 
-void fillJsonMap(std::unordered_map<size_t, std::unordered_map<size_t, std::unordered_map<size_t, std::multimap<std::string, std::string>>>>& jsonMap, 
+void filljsonVec(std::vector<Task>& jsonVec, 
     std::string::iterator it, std::string::iterator end) {
 
     if(*it != '{') error();
     ++it;
     while(*it == ' ' || *it == '\n') ++it;
-    while(it != end) retrieveTask(it, end, jsonMap); 
+    while(it != end) retrieveTask(it, end, jsonVec); 
 }
 
 
-void retrieveTask(std::string::iterator& it, const std::string::iterator& end, 
-    std::unordered_map<size_t, std::unordered_map<size_t, std::unordered_map<size_t, std::multimap<std::string, std::string>>>>& jsonMap) {	
+void retrieveTask(std::string::iterator& it, const std::string::iterator& end, std::vector<Task>& jsonVec) {	
     		
     if(*it != '"') error();
     std::string::iterator first(++it);
@@ -82,7 +95,7 @@ void retrieveTask(std::string::iterator& it, const std::string::iterator& end,
 
     size_t year = toNumber(key);
     if(year == 0) error(); // Мб можно добавить ограничение сверху или сниpу
-
+    
     auto [key_month, str_month] = retrievePair(it, end);
     size_t month = toNumber(str_month);
     if(key_month != "month" || month == 0 || month > 12) error(); 
@@ -96,11 +109,11 @@ void retrieveTask(std::string::iterator& it, const std::string::iterator& end,
     size_t hour = toNumber(time.substr(0, 2)), min = toNumber(time.substr(3, 2));
     if(time[2] != ':' || hour > 23 || min > 59) error();
 
-    auto [key_task, task] = retrievePair(it, end);
-    if(key_task != "task") error();
+    auto [key_description, description] = retrievePair(it, end);
+    if(key_description != "task") error();
 
-    // std::cout << year << " -> " << month << " -> " << day << " -> " << time << " -> " << task << std::endl << std::endl;
-    jsonMap[year][month][day].emplace(time, task);
+    std::cout << year << " -> " << month << " -> " << day << " -> " << time << " -> " << description << std::endl << std::endl;
+    jsonVec.push_back(Task(year, month, day, time, description));
 }
 
 
@@ -150,30 +163,20 @@ size_t toNumber(std::string_view string) {
 }
 
 
-void printJsonMap(const std::unordered_map<size_t, std::unordered_map<size_t, std::unordered_map<size_t, std::multimap<std::string, std::string>>>>& jsonMap) {
-    std::cout <<  "year -> month -> day -> time -> task" << std::endl;
-    for(const auto& [year, umap] : jsonMap)
-        for(const auto& [month, umap] : umap)
-            for(const auto& [day, umap] : umap)
-                for(const auto& [time, task] : umap)
-                    std::cout << year << " -> " << month << " -> " << day << " -> " << time << " -> " << task << std::endl;
-}
-
-
 void error(){
     std::cerr << "Incorrect format of the json file." << std::endl;
     exit(1); 
 }
 
 
-void createJson(const std::string& filename, std::unordered_map<size_t, std::unordered_map<size_t, std::unordered_map<size_t, std::multimap<std::string, std::string>>>>& jsonMap) {
+/*void createJson(const std::string& filename, std::vector<Task>& jsonVec) {
     // По функциям раскид потом
     std::ofstream stream(filename);
-    /*if(!stream) {
+    if(!stream) {
         std::cerr << "Unable to open the json file" << std::endl;
         exit(1);
     }
-    // string = std::string((std::istreambuf_iterator<char>(stream)), (std::istreambuf_iterator<char>()));*/
+    // string = std::string((std::istreambuf_iterator<char>(stream)), (std::istreambuf_iterator<char>()));
     stream.close();
-}
+}*/
 
