@@ -12,13 +12,15 @@ namespace Json {
         size_t year = 0;
         size_t month = 0;
         size_t day = 0;
-        std::string time;
+        size_t hour = 0;
+        size_t min = 0;
         std::string description;
         Task() {}
-        Task(size_t year, size_t month, size_t day, std::string_view time, std::string_view description) : year(year), month(month), day(day), time(time), description(description) {}
-        void print() const { std::cout << year << " -> " << month << " -> " << day << " -> " << time << " -> " << description << std::endl; }
+        Task(size_t year, size_t month, size_t day, size_t hour, size_t min, std::string_view description) : year(year), month(month), day(day), hour(hour), min(min), description(description) {}
+        bool operator>(const Task&);
     };
-    
+    std::ostream &operator<<(std::ostream &, const Task&);
+        
     using Value = std::vector<Task>;
     
     class Reader {
@@ -30,16 +32,25 @@ namespace Json {
         std::pair<std::string_view, std::string_view> retrievePair();
         size_t toNumber(std::string_view) const;
         void error() const;
-    public: 
+    public:
+  /*    std::ostream &operator<<(std::ostream &stream, const Reader &reader) {
+	for(const auto& task : reader.jsonVec) {
+		std::cout << task;
+	}
+	return stream;
+}*/
+        
         void readJson(const std::string&);
         void printJson() const { std::cout << string << std::endl; }
         
         void parse();
         void print() const;
     };
+    
+    
 }
 
-void sortTasks(Json::Value jsonVec);
+// void sortTasks(Json::Value&);
 
 int main() {
     Json::Reader reader;
@@ -52,11 +63,23 @@ int main() {
     return 0;
 }
 
-void sortTasks(Json::Value jsonVec){
+//void sortTasks(Json::Value& jsonVec){
+    
+//}
 
+std::ostream &Json::operator<<(std::ostream &stream, const Task &task) { 
+    stream << task.year << " -> " << task.month << " -> " << task.day << " -> " << task.hour << ":" << task.min << " -> " << task.description << std::endl; 
+    return stream;
 }
 
-void Json::Reader::readJson(const std::string& filename) {
+/*std::ostream &Json::Reader::operator<<(std::ostream &stream, const Reader &reader) {
+	for(const auto& task : reader.jsonVec) {
+		std::cout << task;
+	}
+	return stream;
+}*/
+
+void Json::Reader::readJson(const std::string &filename) {
     std::ifstream stream(filename);
     if(!stream) {
         std::cerr << "Unable to open the json file" << std::endl;
@@ -121,7 +144,7 @@ void Json::Reader::retrieveTask() {
     }
 
     // std::cout << year << " -> " << month << " -> " << day << " -> " << time << " -> " << description << std::endl << std::endl;
-    jsonVec.push_back(Task(year, month, day, time, description));
+    jsonVec.push_back(Task(year, month, day, hour, min, description));
 }
 
 
@@ -162,7 +185,7 @@ std::pair<std::string_view, std::string_view> Json::Reader::retrievePair() {
 
 void Json::Reader::print() const{
 	for(const auto& task : jsonVec) {
-		task.print();
+		std::cout << task;
 	}
 }
 
@@ -179,6 +202,26 @@ size_t Json::Reader::toNumber(std::string_view string) const {
 void Json::Reader::error() const {
     std::cerr << "Incorrect format of the json file." << std::endl;
     exit(1); 
+}
+
+
+bool Json::Task::operator>(const Task& task){ 
+    if(year > task.year) return true;
+    if(year < task.year) return false;
+    
+    if(month > task.month) return true;
+    if(month < task.month) return false; 
+    
+    if(day > task.day) return true;
+    if(day < task.day) return false; 
+    
+    if(hour > task.hour) return true;
+    if(hour < task.hour) return false; 
+    
+    if(min > task.min) return true;
+    if(min < task.min) return false;
+    
+    return false;
 }
 
 
