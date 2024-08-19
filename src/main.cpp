@@ -6,6 +6,7 @@
 #include <charconv> // std::from_chars (либо не через string_view принимать)
 #include <utility> // std::pair (возврат значений из функции)
 // #include "json.h"
+#include <algorithm>
 
 namespace Json {
     struct Task { 
@@ -17,7 +18,7 @@ namespace Json {
         std::string description;
         Task() {}
         Task(size_t year, size_t month, size_t day, size_t hour, size_t min, std::string_view description) : year(year), month(month), day(day), hour(hour), min(min), description(description) {}
-        bool operator>(const Task&);
+        bool operator<(const Task&);
     };
     using Value = std::vector<Task>;
     std::ostream &operator<<(std::ostream &, const Task&);
@@ -39,11 +40,9 @@ namespace Json {
         void parse();
         void print() const { std::cout << jsonVec; }
     };
-    
-    
 }
 
-// void sortTasks(Json::Value&);
+void sortTasks(Json::Value&);
 
 int main() {
     Json::Reader reader;
@@ -51,14 +50,22 @@ int main() {
     reader.printJson();
     std::cout << "\n--------------------------------------------------------------------------------\nResult after reading json file:\n\n";
     reader.parse();
-    reader.print();
+    // reader.print();
+    
+    Json::Task t1(2025, 8, 11, 1, 38, "Implement a 'smart' calculator that treats every user error as a new calculation method");
+    Json::Task t2(2025, 8, 19, 10, 6, "Create a program that randomly replaces all spaces in a text with emojis");
+    Json::Task t3(2024, 3, 2, 0, 56, "Write a program that generates random conspiracy theories based on user input");
+    Json::Value vec = {t1, t2, t3};
+    std::cout << "\n\n" << vec;
+    sortTasks(vec);
+    std::cout << "\n\n" << vec;
         
     return 0;
 }
 
-//void sortTasks(Json::Value& jsonVec){
-    
-//}
+void sortTasks(Json::Value& jsonVec){
+    std::sort(jsonVec.begin(), jsonVec.end());
+}
 
 std::ostream &Json::operator<<(std::ostream &stream, const Task &task) { 
     stream << task.year << " -> " << task.month << " -> " << task.day << " -> " << task.hour << ":" << task.min << " -> " << task.description << std::endl; 
@@ -193,21 +200,21 @@ void Json::Reader::error() const {
 }
 
 
-bool Json::Task::operator>(const Task& task){ 
-    if(year > task.year) return true;
-    if(year < task.year) return false;
+bool Json::Task::operator<(const Task& task){ 
+    if(year < task.year) { return true; }
+    if(year > task.year) { return false; }
     
-    if(month > task.month) return true;
-    if(month < task.month) return false; 
+    if(month < task.month) { return true; }
+    if(month > task.month) { return false; }
     
-    if(day > task.day) return true;
-    if(day < task.day) return false; 
+    if(day < task.day) { return true; }
+    if(day > task.day) { return false; }
     
-    if(hour > task.hour) return true;
-    if(hour < task.hour) return false; 
+    if(hour < task.hour) { return true; }
+    if(hour > task.hour) { return false; }
     
-    if(min > task.min) return true;
-    if(min < task.min) return false;
+    if(min < task.min) { return true; }
+    if(min > task.min) { return false; }
     
     return false;
 }
