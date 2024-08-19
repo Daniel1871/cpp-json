@@ -6,7 +6,6 @@
 #include <charconv> // std::from_chars (либо не через string_view принимать)
 #include <utility> // std::pair (возврат значений из функции)
 // #include "json.h"
-#include <algorithm>
 
 namespace Json {
     struct Task { 
@@ -16,40 +15,51 @@ namespace Json {
         size_t hour = 0;
         size_t min = 0;
         std::string description;
+
         Task() {}
         Task(size_t year, size_t month, size_t day, size_t hour, size_t min, std::string_view description) : year(year), month(month), day(day), hour(hour), min(min), description(description) {}
+
         bool operator<(const Task&);
     };
+
     using Value = std::vector<Task>;
+
     std::ostream &operator<<(std::ostream &, const Task&);
     std::ostream &operator<<(std::ostream &, const Value&);
     
     class Reader {
+    private:
         Value jsonVec;
         std::string string;
         std::string::iterator it;
         
         void retrieveTask();
         std::pair<std::string_view, std::string_view> retrievePair();
+
         size_t toNumber(std::string_view) const;
+        
         void error() const;
+
     public:        
+        void parse();
         void readJson(const std::string&);
         void printJson() const { std::cout << string << std::endl; }
-        
-        void parse();
         void print() const { std::cout << jsonVec; }
     };
+    
+    
 }
 
-void sortTasks(Json::Value&);
+void sortTasks(Json::Value& jsonVec){
+    std::sort(jsonVec.begin(), jsonVec.end());
+}
 
 int main() {
     Json::Reader reader;
     reader.readJson("tasks_ex.json");
     reader.printJson();
-    std::cout << "\n--------------------------------------------------------------------------------\nResult after reading json file:\n\n";
-    reader.parse();
+    // std::cout << "\n--------------------------------------------------------------------------------\nResult after reading json file:\n\n";
+    // reader.parse();
     // reader.print();
     
     Json::Task t1(2025, 8, 11, 1, 38, "Implement a 'smart' calculator that treats every user error as a new calculation method");
@@ -63,12 +73,9 @@ int main() {
     return 0;
 }
 
-void sortTasks(Json::Value& jsonVec){
-    std::sort(jsonVec.begin(), jsonVec.end());
-}
-
 std::ostream &Json::operator<<(std::ostream &stream, const Task &task) { 
     stream << task.year << " -> " << task.month << " -> " << task.day << " -> " << task.hour << ":" << task.min << " -> " << task.description << std::endl; 
+
     return stream;
 }
 
@@ -76,6 +83,7 @@ std::ostream &Json::operator<<(std::ostream &stream, const Json::Value& jsonVec)
 	for(const auto& task : jsonVec) {
 		std::cout << task;
 	}
+
 	return stream;
 }
 
@@ -83,18 +91,25 @@ void Json::Reader::readJson(const std::string &filename) {
     std::ifstream stream(filename);
     if(!stream) {
         std::cerr << "Unable to open the json file" << std::endl;
+
         exit(1);
     }
+
     string = std::string((std::istreambuf_iterator<char>(stream)), (std::istreambuf_iterator<char>()));
+
     stream.close();
 }
 
 
 void Json::Reader::parse() {
     it = string.begin();
+
     if(*it != '{') { error(); }
+
     ++it;
+    
     while(*it == ' ' || *it == '\n') { ++it; }
+    
     while(it != string.end()) { retrieveTask(); } 
 }
 
@@ -150,11 +165,14 @@ void Json::Reader::retrieveTask() {
 
 std::pair<std::string_view, std::string_view> Json::Reader::retrievePair() {
     if(*it != '"') { error(); }
+
     std::string::iterator first(++it);
+
     while(*it != '"'){
         if(it == string.end()) { error(); }
         ++it;
     }
+
     std::string_view key(first, it++), value;
 
     while(*it == ':' || *it == ' ') { ++it; }
@@ -169,10 +187,12 @@ std::pair<std::string_view, std::string_view> Json::Reader::retrievePair() {
         value = std::string_view(first, it++);
     } else { // Значение - size_t
         first = it;
+
         while(*it != ','){
             if(it == string.end()) { error(); }
             ++it;
         }
+
         value = std::string_view(first, it);
     }
 
@@ -189,13 +209,16 @@ size_t Json::Reader::toNumber(std::string_view string) const {
     if(std::from_chars(string.data(), string.data() + string.size(), number).ec == std::errc()) {
     	return number;
     }
+
     std::cerr << "Invalid conversion to size_t." << std::endl;
+    
     exit(1);
 }
 
 
 void Json::Reader::error() const {
     std::cerr << "Incorrect format of the json file." << std::endl;
+
     exit(1); 
 }
 
@@ -230,4 +253,5 @@ bool Json::Task::operator<(const Task& task){
     // string = std::string((std::istreambuf_iterator<char>(stream)), (std::istreambuf_iterator<char>()));
     stream.close();
 }*/
+
 
