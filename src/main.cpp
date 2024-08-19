@@ -19,9 +19,9 @@ namespace Json {
         Task(size_t year, size_t month, size_t day, size_t hour, size_t min, std::string_view description) : year(year), month(month), day(day), hour(hour), min(min), description(description) {}
         bool operator>(const Task&);
     };
-    std::ostream &operator<<(std::ostream &, const Task&);
-        
     using Value = std::vector<Task>;
+    std::ostream &operator<<(std::ostream &, const Task&);
+    std::ostream &operator<<(std::ostream &, const Value&);
     
     class Reader {
         Value jsonVec;
@@ -32,19 +32,12 @@ namespace Json {
         std::pair<std::string_view, std::string_view> retrievePair();
         size_t toNumber(std::string_view) const;
         void error() const;
-    public:
-  /*    std::ostream &operator<<(std::ostream &stream, const Reader &reader) {
-	for(const auto& task : reader.jsonVec) {
-		std::cout << task;
-	}
-	return stream;
-}*/
-        
+    public:        
         void readJson(const std::string&);
         void printJson() const { std::cout << string << std::endl; }
         
         void parse();
-        void print() const;
+        void print() const { std::cout << jsonVec; }
     };
     
     
@@ -72,12 +65,12 @@ std::ostream &Json::operator<<(std::ostream &stream, const Task &task) {
     return stream;
 }
 
-/*std::ostream &Json::Reader::operator<<(std::ostream &stream, const Reader &reader) {
-	for(const auto& task : reader.jsonVec) {
+std::ostream &Json::operator<<(std::ostream &stream, const Json::Value& jsonVec) {
+	for(const auto& task : jsonVec) {
 		std::cout << task;
 	}
 	return stream;
-}*/
+}
 
 void Json::Reader::readJson(const std::string &filename) {
     std::ifstream stream(filename);
@@ -183,11 +176,6 @@ std::pair<std::string_view, std::string_view> Json::Reader::retrievePair() {
     return std::make_pair(key, value);
 }
 
-void Json::Reader::print() const{
-	for(const auto& task : jsonVec) {
-		std::cout << task;
-	}
-}
 
 size_t Json::Reader::toNumber(std::string_view string) const {
     size_t number = 0;
