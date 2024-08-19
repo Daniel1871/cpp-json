@@ -2,11 +2,11 @@
 #include <fstream>
 #include <string>
 #include <string_view>
+#include <vector>
 #include <charconv> // std::from_chars (либо не через string_view принимать)
 #include <utility> // std::pair (возврат значений из функции)
 // #include "json.h"
 
-#include <vector>
 
 struct Task { 
     size_t year = 0;
@@ -19,49 +19,42 @@ struct Task {
     void print() const { std::cout << year << " -> " << month << " -> " << day << " -> " << time << " -> " << description << std::endl; }
 };
 
-void printTasks(std::vector<Task>& jsonVec){
-	for(const auto& task : jsonVec) {
-		task.print();
-	}
-}
-
-void createJson(const std::string&, std::vector<Task>&);
-
-void readJson(const std::string&, std::string&);
-
-void filljsonVec(std::vector<Task>&, std::string::iterator, std::string::iterator);
-
-void retrieveTask(std::string::iterator&, const std::string::iterator&, std::vector<Task>&);
+class Reader {
+    std::vector<Task> jsonVec;
     
-std::pair<std::string_view, std::string_view> retrievePair(std::string::iterator&, const std::string::iterator&);
+    void retrieveTask(std::string::iterator&, const std::string::iterator&);
+    std::pair<std::string_view, std::string_view> retrievePair(std::string::iterator&, const std::string::iterator&);
+    size_t toNumber(std::string_view);
+    void error();
+public: 
+    void readJson(const std::string&, std::string&);
+    void fillJsonVec(std::string::iterator, std::string::iterator);
+    void printJson();
+    
 
-size_t toNumber(std::string_view);
-
-void printjsonVec(const std::vector<Task>&);
-
-void error();
+};
 
 
 int main() {
+    Reader reader;
+ 
     std::string string;
-    readJson("tasks_ex.json", string);
+    reader.readJson("tasks_ex.json", string);
     
     std::cout << string << "\n--------------------------------------------------------------------------------\n";
     
     std::vector<Task> jsonVec;
-    filljsonVec(jsonVec, string.begin(), string.end());
+    reader.fillJsonVec(string.begin(), string.end());
 
     std::cout << "\nResult after reading json file:\n\n";
-    
-    printTasks(jsonVec);
-    
+    reader.printJson();
+        
     // createJson("new_json", jsonVec);
     
     return 0;
 }
 
-
-void readJson(const std::string& filename, std::string& string) {
+void Reader::readJson(const std::string& filename, std::string& string) {
     std::ifstream stream(filename);
     if(!stream) {
         std::cerr << "Unable to open the json file" << std::endl;
@@ -72,18 +65,16 @@ void readJson(const std::string& filename, std::string& string) {
 }
 
 
-void filljsonVec(std::vector<Task>& jsonVec, 
-    std::string::iterator it, std::string::iterator end) {
+void Reader::fillJsonVec(std::string::iterator it, std::string::iterator end) {
 
     if(*it != '{') { error(); }
     ++it;
     while(*it == ' ' || *it == '\n') { ++it; }
-    while(it != end) { retrieveTask(it, end, jsonVec); } 
+    while(it != end) { retrieveTask(it, end); } 
 }
 
 
-void retrieveTask(std::string::iterator& it, const std::string::iterator& end, std::vector<Task>& jsonVec) {	
-    		
+void Reader::retrieveTask(std::string::iterator& it, const std::string::iterator& end) {
     if(*it != '"') { error(); }
     std::string::iterator first(++it);
     while(*it != '"'){
@@ -127,12 +118,12 @@ void retrieveTask(std::string::iterator& it, const std::string::iterator& end, s
     	error();
     }
 
-    std::cout << year << " -> " << month << " -> " << day << " -> " << time << " -> " << description << std::endl << std::endl;
+    // std::cout << year << " -> " << month << " -> " << day << " -> " << time << " -> " << description << std::endl << std::endl;
     jsonVec.push_back(Task(year, month, day, time, description));
 }
 
 
-std::pair<std::string_view, std::string_view> retrievePair(std::string::iterator& it, const std::string::iterator& end) {
+std::pair<std::string_view, std::string_view> Reader::retrievePair(std::string::iterator& it, const std::string::iterator& end) {
     if(*it != '"') { error(); }
     std::string::iterator first(++it);
     while(*it != '"'){
@@ -168,7 +159,7 @@ std::pair<std::string_view, std::string_view> retrievePair(std::string::iterator
 }
 
 
-size_t toNumber(std::string_view string) {
+size_t Reader::toNumber(std::string_view string) {
     size_t number = 0;
     if(std::from_chars(string.data(), string.data() + string.size(), number).ec == std::errc()) {
     	return number;
@@ -178,13 +169,24 @@ size_t toNumber(std::string_view string) {
 }
 
 
-void error(){
+void Reader::error(){
     std::cerr << "Incorrect format of the json file." << std::endl;
     exit(1); 
 }
 
 
-/*void createJson(const std::string& filename, std::vector<Task>& jsonVec) {
+void Reader::printJson(){
+	for(const auto& task : jsonVec) {
+		task.print();
+	}
+}
+
+
+
+
+
+
+/*void createJson(const std::string& filename) {
     // По функциям раскид потом
     std::ofstream stream(filename);
     if(!stream) {
