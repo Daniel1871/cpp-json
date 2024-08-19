@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.14)
 project(cpp-json)
 set(CMAKE_CXX_STANDARD 20)
+add_compile_options(-Wall -Werror)
 add_executable(main src/main.cpp)
 
 file(GLOB JSON_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/json-examples/*.json")
