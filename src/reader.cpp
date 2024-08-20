@@ -48,11 +48,11 @@ std::ostream &Json::operator<<(std::ostream &stream, const Task &task) {
 }
 
 std::ostream &Json::operator<<(std::ostream &stream, const Json::Value& jsonVec) {
-	for(const auto& task : jsonVec) {
-		std::cout << task;
-	}
+    for(const auto& task : jsonVec) {
+        std::cout << task;
+    }
 
-	return stream;
+    return stream;
 }
 
 void sortTasks(Json::Value& jsonVec){
@@ -76,7 +76,7 @@ void Json::Reader::readJson(const std::string &filename) {
 
 
 void Json::Reader::parse(const std::string &filename, Json::Value& jsonVec) {
-	readJson(filename);
+    readJson(filename);
 
     if(*it != '{') {
     	error();
