@@ -7,6 +7,8 @@
 #include <utility> // std::pair (возврат значений из функции)
 // #include "json.h"
 
+// #include <algorithm>
+
 namespace Json {
     struct Task { 
         size_t year = 0;
@@ -29,49 +31,48 @@ namespace Json {
     
     class Reader {
     private:
-        Value jsonVec;
         std::string string;
         std::string::iterator it;
         
-        void retrieveTask();
+        void retrieveTask(Value&);
         std::pair<std::string_view, std::string_view> retrievePair();
 
         size_t toNumber(std::string_view) const;
         
         void error() const;
 
-    public:        
-        void parse();
+    public:
         void readJson(const std::string&);
         void printJson() const { std::cout << string << std::endl; }
-        void print() const { std::cout << jsonVec; }
+        void parse(Value&);
+        void print(Value& jsonVec) const { std::cout << jsonVec; }
     };
     
     
+}
+
+void sortTasks(Json::Value&);
+
+int main() {
+	Json::Value jsonVec;
+    Json::Reader reader;
+    reader.readJson("tasks_ex.json");
+    reader.printJson();
+    std::cout << "\n--------------------------------------------------------------------------------\nResult after reading json file:\n\n";
+    reader.parse(jsonVec);
+    reader.print(jsonVec);
+    
+    std::cout << "\n--------------------------------------------------------------------------------\n";
+    sortTasks(jsonVec);
+    reader.print(jsonVec);
+        
+    return 0;
 }
 
 void sortTasks(Json::Value& jsonVec){
     std::sort(jsonVec.begin(), jsonVec.end());
 }
 
-int main() {
-    Json::Reader reader;
-    reader.readJson("tasks_ex.json");
-    reader.printJson();
-    // std::cout << "\n--------------------------------------------------------------------------------\nResult after reading json file:\n\n";
-    // reader.parse();
-    // reader.print();
-    
-    Json::Task t1(2025, 8, 11, 1, 38, "Implement a 'smart' calculator that treats every user error as a new calculation method");
-    Json::Task t2(2025, 8, 19, 10, 6, "Create a program that randomly replaces all spaces in a text with emojis");
-    Json::Task t3(2024, 3, 2, 0, 56, "Write a program that generates random conspiracy theories based on user input");
-    Json::Value vec = {t1, t2, t3};
-    std::cout << "\n\n" << vec;
-    sortTasks(vec);
-    std::cout << "\n\n" << vec;
-        
-    return 0;
-}
 
 std::ostream &Json::operator<<(std::ostream &stream, const Task &task) { 
     stream << task.year << " -> " << task.month << " -> " << task.day << " -> " << task.hour << ":" << task.min << " -> " << task.description << std::endl; 
@@ -101,26 +102,39 @@ void Json::Reader::readJson(const std::string &filename) {
 }
 
 
-void Json::Reader::parse() {
+void Json::Reader::parse(Json::Value& jsonVec) {
     it = string.begin();
 
-    if(*it != '{') { error(); }
+    if(*it != '{') {
+    	error();
+    }
 
     ++it;
     
-    while(*it == ' ' || *it == '\n') { ++it; }
+    while(*it == ' ' || *it == '\n') { 
+    	++it;
+    }
     
-    while(it != string.end()) { retrieveTask(); } 
+    while(it != string.end()) {
+    	retrieveTask(jsonVec);
+    }
 }
 
 
-void Json::Reader::retrieveTask() {
-    if(*it != '"') { error(); }
+void Json::Reader::retrieveTask(Json::Value& jsonVec) {
+    if(*it != '"') {
+    	error();
+    }
+
     std::string::iterator first(++it);
+
     while(*it != '"'){
-        if(it == string.end()) { error(); }
+        if(it == string.end()) {
+        	error();
+        }
         ++it;
     }
+
     std::string_view key(first, it++);
 
     while(*it == ':' || *it == ' ' || *it == '\n' || *it == '[' || *it == '{') {
@@ -164,24 +178,34 @@ void Json::Reader::retrieveTask() {
 
 
 std::pair<std::string_view, std::string_view> Json::Reader::retrievePair() {
-    if(*it != '"') { error(); }
+    if(*it != '"') {
+    	error();
+    }
 
     std::string::iterator first(++it);
 
     while(*it != '"'){
-        if(it == string.end()) { error(); }
+        if(it == string.end()) {
+        	error();
+        }
         ++it;
     }
 
     std::string_view key(first, it++), value;
 
-    while(*it == ':' || *it == ' ') { ++it; }
+    while(*it == ':' || *it == ' ') {
+    	++it;
+    }
 
     if(*it == '"'){ // Значение - строка
         first = ++it;
         while(*it != '"'){
-            if(it == string.end()) { error(); }
-            if(*it == '\\') { ++it; } // Экранированным мб только значение, причем именно строка (ключи заранее знаем и сверяем их в retrieveTask)
+            if(it == string.end()) {
+            	error();
+            }
+            if(*it == '\\') { // Экранированным мб только значение, причем именно строка (ключи заранее знаем и сверяем их в retrieveTask)
+            	++it;
+            } 
             ++it;
         }
         value = std::string_view(first, it++);
@@ -189,7 +213,9 @@ std::pair<std::string_view, std::string_view> Json::Reader::retrievePair() {
         first = it;
 
         while(*it != ','){
-            if(it == string.end()) { error(); }
+            if(it == string.end()) {
+            	error();
+            }
             ++it;
         }
 
@@ -224,20 +250,40 @@ void Json::Reader::error() const {
 
 
 bool Json::Task::operator<(const Task& task){ 
-    if(year < task.year) { return true; }
-    if(year > task.year) { return false; }
+    if(year < task.year) {
+    	return true;
+    }
+    if(year > task.year) {
+    	return false;
+    }
     
-    if(month < task.month) { return true; }
-    if(month > task.month) { return false; }
+    if(month < task.month) {
+    	return true;
+    }
+    if(month > task.month) {
+    	return false; 
+    }
     
-    if(day < task.day) { return true; }
-    if(day > task.day) { return false; }
+    if(day < task.day) {
+    	return true; 
+    }
+    if(day > task.day) {
+    	return false; 
+    }
     
-    if(hour < task.hour) { return true; }
-    if(hour > task.hour) { return false; }
+    if(hour < task.hour) {
+    	return true; 
+    }
+    if(hour > task.hour) {
+    	return false; 
+    }
     
-    if(min < task.min) { return true; }
-    if(min > task.min) { return false; }
+    if(min < task.min) {
+    	return true; 
+    }
+    if(min > task.min) {
+    	return false; 
+    }
     
     return false;
 }
