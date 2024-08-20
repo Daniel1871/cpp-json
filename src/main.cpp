@@ -34,6 +34,7 @@ namespace Json {
         std::string string;
         std::string::iterator it;
         
+        void readJson(const std::string&);
         void retrieveTask(Value&);
         std::pair<std::string_view, std::string_view> retrievePair();
 
@@ -42,9 +43,8 @@ namespace Json {
         void error() const;
 
     public:
-        void readJson(const std::string&);
-        void printJson() const { std::cout << string << std::endl; }
-        void parse(Value&);
+    	void parse(const std::string&, Value&);
+        void printFile() const { std::cout << string << std::endl; }
         void print(Value& jsonVec) const { std::cout << jsonVec; }
     };
     
@@ -56,13 +56,13 @@ void sortTasks(Json::Value&);
 int main() {
 	Json::Value jsonVec;
     Json::Reader reader;
-    reader.readJson("tasks_ex.json");
-    reader.printJson();
+
+	reader.parse("tasks.json", jsonVec);
+	reader.printFile();
     std::cout << "\n--------------------------------------------------------------------------------\nResult after reading json file:\n\n";
-    reader.parse(jsonVec);
     reader.print(jsonVec);
     
-    std::cout << "\n--------------------------------------------------------------------------------\n";
+    std::cout << "\n--------------------------------------------------------------------------------\nSorted jsonVec:\n\n";
     sortTasks(jsonVec);
     reader.print(jsonVec);
         
@@ -97,13 +97,14 @@ void Json::Reader::readJson(const std::string &filename) {
     }
 
     string = std::string((std::istreambuf_iterator<char>(stream)), (std::istreambuf_iterator<char>()));
-
+	it = string.begin();
+	
     stream.close();
 }
 
 
-void Json::Reader::parse(Json::Value& jsonVec) {
-    it = string.begin();
+void Json::Reader::parse(const std::string &filename, Json::Value& jsonVec) {
+	readJson(filename);
 
     if(*it != '{') {
     	error();
