@@ -40,7 +40,17 @@ int main() {
     
     Json::Task t1(2023, 1, 1, 1, 1, "gg");
     Json::Task t2(2023, 1, 1, 1, 1, "ggg");
-    std::cout << std::boolalpha << (t1 == t2);
+    std::cout << std::endl << std::boolalpha << (t1 == t2);
+    
+    //Json::Value v1 = {t1, t2};
+    //Json::Value v2 = {t1, t2};
+    
+    //std::cout << std::boolalpha << (v1 == v2);
+    
+    std::vector<Json::Task> v1 = {t1,t2}; std::vector<Json::Task> v2 = {t1,t2};
+    std::cout << std::boolalpha << (v1 == v2);
+    
+    
     
     
         
