@@ -13,8 +13,7 @@
 #include "reader.h"
 
 namespace Json {
-    class Task { 
-    public:
+    struct Task { 
         size_t year = 0;
         size_t month = 0;
         size_t day = 0;
