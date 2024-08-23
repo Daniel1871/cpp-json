@@ -41,6 +41,13 @@ bool Json::Task::operator<(const Task& task){
     return false;
 }
 
+bool Json::Task::operator==(const Task& task){ 
+    if(year == task.year && month == task.month && day == task.day && hour == task.hour && min == task.min && description == task.description) {
+    	return true;
+    }
+    return false;
+}
+
 std::ostream &Json::operator<<(std::ostream &stream, const Task &task) { 
     stream << task.year << " -> " << task.month << " -> " << task.day << " -> " << task.hour << ":" << task.min << " -> " << task.description << std::endl; 
 

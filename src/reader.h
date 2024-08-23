@@ -25,6 +25,7 @@ namespace Json {
         Task(size_t year, size_t month, size_t day, size_t hour, size_t min, std::string_view description) : year(year), month(month), day(day), hour(hour), min(min), description(description) {}
 
         bool operator<(const Task&);
+        bool operator==(const Task&);
     };
 
     using Value = std::vector<Task>;

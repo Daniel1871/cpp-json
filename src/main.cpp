@@ -38,6 +38,10 @@ int main() {
     ASSERT_HINT(1,2, "ggg");
     ASSERT(1,2.5);
     
+    Json::Task t1(2023, 1, 1, 1, 1, "gg");
+    Json::Task t2(2023, 1, 1, 1, 1, "ggg");
+    std::cout << std::boolalpha << (t1 == t2);
+    
     
         
     return 0;
